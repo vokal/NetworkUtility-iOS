@@ -8,7 +8,6 @@
 
 #import "RemoteNetworkUtility.h"
 #import "HttpUserCredentials.h"
-#import "JSONKit.h"
 
 #define DEBUG_MODE  1
 #define TIMEOUT     30.0
