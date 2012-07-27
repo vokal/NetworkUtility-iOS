@@ -128,7 +128,7 @@
             responseData.response = response;
             
             NSLog(@"RESPONSE CODE: %d",response.statusCode);
-        
+            
             if (response.statusCode == 0) {
                 [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_OFFLINE
                                                                     object:nil];
