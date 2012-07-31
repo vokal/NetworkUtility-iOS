@@ -51,6 +51,11 @@ static NetworkUtility *_instance = nil;
     return [self.delegate post:url withParameters:params filePath:filePath authenticate:authenticate error:error];
 }
 
+- (ResponseData *)postMultiPartFormData:(NSString *)url withParameters:(NSDictionary *)params authenticate:(BOOL)authenticate error:(NSError *)error
+{
+    return [self.delegate postMultiPartFormData:url withParameters:params  authenticate:authenticate error:error];
+}
+
 @end
 
 @implementation ResponseData
