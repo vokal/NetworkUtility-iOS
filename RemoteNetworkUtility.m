@@ -12,6 +12,12 @@
 #define DEBUG_MODE  1
 #define TIMEOUT     30.0
 
+@interface RemoteNetworkUtility ()
+{
+    int _numberOfRequests;
+}
+@end
+
 @implementation RemoteNetworkUtility
 
 @synthesize connection;
@@ -97,6 +103,7 @@
 
 - (ResponseData *)makeRequest:(NSMutableURLRequest *)request authenticate:(BOOL)authenticate withError:(NSError *)error
 {
+    _numberOfRequests++;
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
     
     [self setAcceptsHeader:request];
@@ -108,7 +115,11 @@
     connection = [[NSURLConnection alloc] init];
     
     if (connection == nil) {
-        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        _numberOfRequests--;
+        
+        if (_numberOfRequests == 0) {
+            [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        }
         
         NSMutableDictionary *errorDetails = [NSMutableDictionary dictionary];
         [errorDetails setValue:@"No connection" forKey:NSLocalizedDescriptionKey];
@@ -139,7 +150,11 @@
             
             return responseData;
         } @finally {
-            [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+            _numberOfRequests--;
+            
+            if (_numberOfRequests == 0) {
+                [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+            }
         }
     }
     
