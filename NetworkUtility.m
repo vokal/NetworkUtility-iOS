@@ -56,6 +56,17 @@ static NetworkUtility *_instance = nil;
     return [self.delegate postMultiPartFormData:url withParameters:params  authenticate:authenticate error:error];
 }
 
+- (ResponseData *)post:(NSString *)url withParameters:(NSDictionary *)params image:(UIImage*)image authenticate:(BOOL)authenticate error:(NSError *)error
+{
+    return [self.delegate post:url withParameters:params image:image authenticate:authenticate error:error];
+}
+
+- (void)setPostBodyEncodingMethod:(PostBodyEncodingMethod)method
+{
+    [self.delegate setPostBodyEncodingMethod:method];
+}
+
+
 @end
 
 @implementation ResponseData

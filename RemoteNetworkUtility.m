@@ -16,6 +16,9 @@
 {
     int _numberOfRequests;
 }
+
+@property PostBodyEncodingMethod encodingMethod;
+
 @end
 
 @implementation RemoteNetworkUtility
@@ -23,8 +26,15 @@
 @synthesize connection;
 @synthesize header;
 
-- (id)initWithAcceptsHeader:(RemoteNetworkUtilityAcceptsHeader)header {
-    self.header = header;
+- (id)initWithAcceptsHeader:(RemoteNetworkUtilityAcceptsHeader)accepts
+{
+    return [self initWithAcceptsHeader:accepts postBodyEncoding:JsonEncoding];
+}
+
+- (id)initWithAcceptsHeader:(RemoteNetworkUtilityAcceptsHeader)accepts postBodyEncoding:(PostBodyEncodingMethod)encoding
+{
+    self.header = accepts;
+    self.postBodyEncodingMethod = encoding;
     
     return self;
 }
@@ -37,7 +47,7 @@
         url = [NSString stringWithFormat:@"%@?%@", url, [RemoteNetworkUtility getStringForParameters:params]];
     }
 #if DEBUG    
-    NSLog(@"Making request: %@",url);
+    NSLog(@"Making request [GET]: %@",url);
 #endif    
     NSMutableURLRequest *request = [self createRequest:url];
     
@@ -49,7 +59,7 @@
 - (ResponseData *)post:(NSString *)url withParameters:(NSDictionary *)params authenticate:(BOOL)authenticate error:(NSError *)error
 {
 #if DEBUG    
-    NSLog(@"Making request: %@ params: %@",url,params);
+    NSLog(@"Making request [POST]: %@ params: %@",url,params);
 #endif    
     NSMutableURLRequest *request = [self createRequest:url];
     if (params != nil) {
@@ -60,10 +70,37 @@
     return [self makeRequest:request authenticate:authenticate withError:error];
 }
 
+- (ResponseData *)post:(NSString *)url withParameters:(NSDictionary *)params image:(UIImage*)image authenticate:(BOOL)authenticate error:(NSError *)error
+{
+#if DEBUG
+    NSLog(@"Making request [POST]: %@",url);
+#endif
+    NSMutableURLRequest *request = [self createRequest:url];
+    [request setHTTPMethod:@"POST"];
+    
+    NSString *boundary = @"14737809831466499882746641449";
+    
+    NSString *contentType = [NSString stringWithFormat:@"multipart/form-data; boundary=%@",boundary];
+	[request addValue:contentType forHTTPHeaderField: @"Content-Type"];
+    
+    NSMutableData *body = [NSMutableData data];
+	[body appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+    [body appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"profile_photo\"; filename=\"profile.jpeg\"\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+    
+    [body appendData:[@"Content-Type: image/jpeg\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
+    
+	[body appendData:UIImageJPEGRepresentation(image, 100)];
+	[body appendData:[[NSString stringWithFormat:@"\r\n--%@--\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+    
+    [request setHTTPBody:body];
+    
+    return [self makeRequest:request authenticate:authenticate withError:error];
+}
+
 - (ResponseData *)put:(NSString *)url withParameters:(NSDictionary *)params authenticate:(BOOL)authenticate error:(NSError *)error
 {
 #if DEBUG    
-    NSLog(@"Making request: %@ params: %@",url,params);
+    NSLog(@"Making request [PUT]: %@ params: %@",url,params);
 #endif    
     NSMutableURLRequest *request = [self createRequest:url];
     
@@ -77,7 +114,7 @@
 - (ResponseData *)delete:(NSString *)url withParameters:(NSDictionary *)params authenticate:(BOOL)authenticate error:(NSError *)error
 {
 #if DEBUG    
-    NSLog(@"Making request: %@ params: %@",url,params);
+    NSLog(@"Making request [DELETE]: %@ params: %@",url,params);
 #endif    
     NSMutableURLRequest *request = [self createRequest:url];
     
@@ -178,6 +215,19 @@
 }
 
 - (void)setRequestParameters:(NSDictionary *)params forRequest:(NSMutableURLRequest *)request
+{
+#warning "Test not written"
+    switch (self.encodingMethod) {
+        case JsonEncoding:
+            [self setRequestParametersWithJsonEncoding:params forRequest:request];
+            break;
+        case UrlEncoding :
+            [self setRequestParametersWithUrlEncoding:params forRequest:request];
+            break;
+    }
+}
+
+- (void)setRequestParametersWithJsonEncoding:(NSDictionary *)params forRequest:(NSMutableURLRequest *)request
 {    
     NSData *requestData = [NSJSONSerialization dataWithJSONObject:params options:NSJSONReadingAllowFragments error:nil];
    
@@ -186,6 +236,41 @@
     [request setValue:requestLength forHTTPHeaderField:@"Content-Length"];
     [request setValue:@"application/json" forHTTPHeaderField:@"content-type"]; 
     [request setHTTPBody:requestData];
+}
+
+- (void)setRequestParametersWithUrlEncoding:(NSDictionary *)params forRequest:(NSMutableURLRequest *)request
+{
+#warning "Test not written"
+    NSMutableString *postBody = [[NSMutableString alloc] initWithString:@""];
+    NSMutableString *val = [[NSMutableString alloc] init];;
+    for (NSString *key in params) {
+        id object = [params objectForKey:key];
+        if ([object isKindOfClass:[NSArray class]]) {
+            [val setString:@""];
+            for(id objectFromArray in (NSArray *)object) {
+                NSString *stringFromArray = [NSString stringWithFormat:@"%@", objectFromArray];
+                if ([postBody length] > 0)
+                    [postBody appendFormat:@"&%@=%@", key, [RemoteNetworkUtility urlEncodedString:stringFromArray]];
+                else
+                    [postBody appendFormat:@"%@=%@", key, [RemoteNetworkUtility urlEncodedString:stringFromArray]];
+            }
+        }
+        else {
+            [val setString:[NSString stringWithFormat:@"%@", object]];
+            if ([postBody length] > 0)
+                [postBody appendFormat:@"&%@=%@", key, [RemoteNetworkUtility urlEncodedString:val]];
+            else
+                [postBody appendFormat:@"%@=%@", key, [RemoteNetworkUtility urlEncodedString:val]];
+        }        
+    }
+    
+    NSData *postData = [postBody dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+    
+    NSString *postLength = [NSString stringWithFormat:@"%d", [postData length]];
+    
+    [request setValue:postLength forHTTPHeaderField:@"Content-Length"];
+    [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
+    [request setHTTPBody:postData];
 }
 
 - (void)setAuthenticationForRequest:(NSMutableURLRequest *)request 
@@ -202,11 +287,16 @@
     char encodeArray[512];
     memset(encodeArray, '\0', sizeof(encodeArray));
     base64encode([encodeData length], (char *)[encodeData bytes], sizeof(encodeArray), encodeArray);
-    dataStr = [NSString stringWithCString:encodeArray length:strlen(encodeArray)];
+    NSString *encodedString = [[NSString alloc] initWithBytes:encodeArray length:sizeof(encodeArray) encoding:NSASCIIStringEncoding];
     
-    NSString *authenticationString = [@"" stringByAppendingFormat:@"Basic %@", dataStr];
+    NSString *authenticationString = [@"" stringByAppendingFormat:@"Basic %@", encodedString];
     
     [request addValue:authenticationString forHTTPHeaderField:@"Authorization"];
+}
+
+- (void)setPostBodyEncodingMethod:(PostBodyEncodingMethod)method
+{
+    self.encodingMethod = method;
 }
 
 #pragma mark - class methods
