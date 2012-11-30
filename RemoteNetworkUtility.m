@@ -216,7 +216,6 @@
 
 - (void)setRequestParameters:(NSDictionary *)params forRequest:(NSMutableURLRequest *)request
 {
-#warning "Test not written"
     switch (self.encodingMethod) {
         case JsonEncoding:
             [self setRequestParametersWithJsonEncoding:params forRequest:request];
@@ -240,7 +239,6 @@
 
 - (void)setRequestParametersWithUrlEncoding:(NSDictionary *)params forRequest:(NSMutableURLRequest *)request
 {
-#warning "Test not written"
     NSMutableString *postBody = [[NSMutableString alloc] initWithString:@""];
     NSMutableString *val = [[NSMutableString alloc] init];;
     for (NSString *key in params) {
@@ -271,6 +269,8 @@
     [request setValue:postLength forHTTPHeaderField:@"Content-Length"];
     [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
     [request setHTTPBody:postData];
+    
+    NSLog(@"%@", [[NSString alloc] initWithData:[request HTTPBody] encoding:NSASCIIStringEncoding]);
 }
 
 - (void)setAuthenticationForRequest:(NSMutableURLRequest *)request 
