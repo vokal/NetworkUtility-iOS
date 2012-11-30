@@ -388,7 +388,7 @@ int base64encode(unsigned s_len, char *src, unsigned d_len, char *dst)
     
     for (triad = 0; triad < s_len; triad += 3)
     {
-        unsigned long int sr;
+        unsigned long int sr = 0;
         unsigned byte;
         
         for (byte = 0; (byte<3)&&(triad+byte<s_len); ++byte)
