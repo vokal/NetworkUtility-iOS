@@ -24,7 +24,7 @@
 @optional
     - (ResponseData *)post:(NSString *)url withParameters:(NSDictionary *)params filePath:(NSString *)filePath authenticate:(BOOL)authenticate error:(NSError *)error;
     - (ResponseData *)postMultiPartFormData:(NSString *)url withParameters:(NSDictionary *)params authenticate:(BOOL)authenticate error:(NSError *)error;
-
+    - (ResponseData *)post:(NSString *)url withParameters:(NSDictionary *)params image:(UIImage*)image withName:(NSString*)name authenticate:(BOOL)authenticate error:(NSError *)error;
 @end
 
 @interface NetworkUtility : NSObject
@@ -41,5 +41,6 @@
 - (ResponseData *)delete:(NSString *)url withParameters:(NSDictionary *)params authenticate:(BOOL)authenticate error:(NSError *)error;
 - (ResponseData *)post:(NSString *)url withParameters:(NSDictionary *)params filePath:(NSString *)filePath authenticate:(BOOL)authenticate error:(NSError *)error;
 - (ResponseData *)postMultiPartFormData:(NSString *)url withParameters:(NSDictionary *)params authenticate:(BOOL)authenticate error:(NSError *)error;
+- (ResponseData *)post:(NSString *)url withParameters:(NSDictionary *)params image:(UIImage*)image withName:(NSString*)name authenticate:(BOOL)authenticate error:(NSError *)error;
 
 @end
