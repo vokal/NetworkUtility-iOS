@@ -20,9 +20,6 @@
 
 @implementation RemoteNetworkUtility
 
-@synthesize connection;
-@synthesize header;
-
 - (id)initWithAcceptsHeader:(RemoteNetworkUtilityAcceptsHeader)header {
     self.header = header;
     
@@ -202,7 +199,7 @@
     char encodeArray[512];
     memset(encodeArray, '\0', sizeof(encodeArray));
     base64encode([encodeData length], (char *)[encodeData bytes], sizeof(encodeArray), encodeArray);
-    dataStr = [NSString stringWithCString:encodeArray length:strlen(encodeArray)];
+    dataStr = [NSString stringWithCString:encodeArray encoding:NSUTF8StringEncoding];
     
     NSString *authenticationString = [@"" stringByAppendingFormat:@"Basic %@", dataStr];
     

@@ -23,9 +23,6 @@ typedef enum {
 } RemoteNetworkUtilityAcceptsHeader;
 
 @interface RemoteNetworkUtility : NSObject <AbstractNetworkUtilityDelegate> 
-{
-    RemoteNetworkUtilityAcceptsHeader header;
-}
 
 @property (nonatomic, strong) NSURLConnection *connection;
 @property (nonatomic) RemoteNetworkUtilityAcceptsHeader header;
