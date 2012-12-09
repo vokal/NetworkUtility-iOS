@@ -63,7 +63,7 @@ static NetworkUtility *_instance = nil;
 
 - (ResponseData *)post:(NSString *)url withParameters:(NSDictionary *)params image:(UIImage*)image authenticate:(BOOL)authenticate error:(NSError *)error
 {
-    return [self.delegate post:url withParameters:params image:image authenticate:authenticate error:error];
+    return [self.delegate post:url withParameters:params image:image withName:@"" authenticate:authenticate error:error];
 }
 
 - (void)setPostBodyEncodingMethod:(PostBodyEncodingMethod)method
