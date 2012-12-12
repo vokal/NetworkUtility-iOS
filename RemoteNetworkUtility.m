@@ -70,33 +70,6 @@
     return [self makeRequest:request authenticate:authenticate withError:error];
 }
 
-- (ResponseData *)post:(NSString *)url withParameters:(NSDictionary *)params image:(UIImage*)image authenticate:(BOOL)authenticate error:(NSError *)error
-{
-#if DEBUG
-    NSLog(@"Making request [POST]: %@",url);
-#endif
-    NSMutableURLRequest *request = [self createRequest:url];
-    [request setHTTPMethod:@"POST"];
-    
-    NSString *boundary = @"14737809831466499882746641449";
-    
-    NSString *contentType = [NSString stringWithFormat:@"multipart/form-data; boundary=%@",boundary];
-	[request addValue:contentType forHTTPHeaderField: @"Content-Type"];
-    
-    NSMutableData *body = [NSMutableData data];
-	[body appendData:[[NSString stringWithFormat:@"\r\n--%@\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
-    [body appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"profile_photo\"; filename=\"profile.jpeg\"\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
-    
-    [body appendData:[@"Content-Type: image/jpeg\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
-    
-	[body appendData:UIImageJPEGRepresentation(image, 100)];
-	[body appendData:[[NSString stringWithFormat:@"\r\n--%@--\r\n",boundary] dataUsingEncoding:NSUTF8StringEncoding]];
-    
-    [request setHTTPBody:body];
-    
-    return [self makeRequest:request authenticate:authenticate withError:error];
-}
-
 - (ResponseData *)put:(NSString *)url withParameters:(NSDictionary *)params authenticate:(BOOL)authenticate error:(NSError *)error
 {
 #if DEBUG    

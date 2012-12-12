@@ -36,8 +36,6 @@ typedef enum {
 - (void)setRequestParameters:(NSDictionary *)params forRequest:(NSMutableURLRequest *)request;
 - (void)setAuthenticationForRequest:(NSMutableURLRequest *)request;
 
-- (ResponseData *)post:(NSString *)url withParameters:(NSDictionary *)params image:(UIImage*)image authenticate:(BOOL)authenticate error:(NSError *)error;
-
 + (NSString *)postdataForParams:(NSDictionary *)params;
 + (NSString *)getStringForParameters:(NSDictionary *)params;
 + (NSString *)urlEncodedString:(NSString *)string;
