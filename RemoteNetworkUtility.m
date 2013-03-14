@@ -148,7 +148,21 @@
             responseData.data = data;
             responseData.response = response;
             
-            NSLog(@"RESPONSE CODE: %d",response.statusCode);
+            if (!response) {
+                NSString *dataStr = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+#if DEBUG
+                NSLog(@"Null response received. Data is: %@", dataStr);
+#endif                
+                if ([dataStr isEqualToString:@"Authorization Required"]) {
+                    responseData.response = [[NSHTTPURLResponse alloc] initWithURL:request.URL
+                                                                        statusCode:401
+                                                                       HTTPVersion:@"HTTP/1.1"
+                                                                      headerFields:nil];
+                }
+            }
+            else {
+                NSLog(@"RESPONSE CODE: %d",response.statusCode);
+            }
             
             if (response.statusCode == 0) {
                 [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_OFFLINE
@@ -157,7 +171,6 @@
                 [[NSNotificationCenter defaultCenter] postNotificationName:NETWORK_ONLINE
                                                                     object:nil];
             }
-            
             return responseData;
         } @finally {
             _numberOfRequests--;
