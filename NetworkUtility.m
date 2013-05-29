@@ -41,6 +41,11 @@ static NetworkUtility *_instance = nil;
     return [self.delegate put:url withParameters:params authenticate:authenticate error:error];
 }
 
+- (ResponseData *)put:(NSString *)url withParameters:(NSDictionary *)params image:(UIImage *)image withName:(NSString *)name authenticate:(BOOL)authenticate error:(NSError *)error
+{
+    return [self.delegate put:url withParameters:params image:image withName:name authenticate:authenticate error:error];
+}
+
 - (ResponseData *)delete:(NSString *)url withParameters:(NSDictionary *)params authenticate:(BOOL)authenticate error:(NSError *)error
 {
     return [self.delegate delete:url withParameters:params authenticate:authenticate error:error];
