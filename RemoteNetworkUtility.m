@@ -65,6 +65,8 @@
     if (params != nil) {
         [self setRequestParameters:params
                         forRequest:request];
+    }else {
+        [request setValue:0 forHTTPHeaderField:@"Content-Length"];
     }
     [request setHTTPMethod:@"POST"];
     return [self makeRequest:request authenticate:authenticate withError:error];
